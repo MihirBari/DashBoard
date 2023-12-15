@@ -1,4 +1,3 @@
-import axios from "axios";
 import React, { useEffect, useState } from "react";
 import DataTable from "react-data-table-component";
 import { MdEdit, MdDelete } from "react-icons/md";
@@ -7,10 +6,12 @@ import API_BASE_URL from "../../config";
 import ExportTable from "../ExportTable";
 import { toast } from "react-toastify";
 import { useNavigate } from 'react-router-dom';
+import axios from "axios";
 
 const ProdTable = () => {
   const [users, setUsers] = useState([]);
   const [exportModalIsOpen, setExportModalIsOpen] = useState(false);
+  const [searchText, setSearchText] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -32,12 +33,12 @@ const ProdTable = () => {
 
   const handleDeleteClick = (row) => {
     const productId = row.product_id;
-     console.log(row.product_id)
+    console.log(row.product_id)
     axios.delete(`${API_BASE_URL}/api/prod/delete`, { data: { productId } })
       .then(response => {
         console.log('Delete successful:', response.data);
         window.location.reload()
-        toast.success("Deleted SuccessFully")
+        toast.success("Deleted Successfully")
       })
       .catch(error => {
         console.error('Error deleting:', error);
@@ -48,12 +49,9 @@ const ProdTable = () => {
     setExportModalIsOpen(true);
   };
 
-
-
   const handleViewClick = (row) => {
     navigate(`${row.product_id}`);
   };
-
 
   const columns = [
     {
@@ -78,11 +76,13 @@ const ProdTable = () => {
       name: "Product Price",
       selector: (row) => row.product_price, 
       sortable: true,
+      width: "150px",
     },
     {
       name: "Cost Price",
       selector: (row) => row.Cost_price,  
       sortable: true,
+      width: "150px",
     },
     {
       name: "Type",
@@ -93,13 +93,25 @@ const ProdTable = () => {
       name: "Description",
       selector: (row) => row.Description,
       sortable: true,
-      width: "250px",
+      width: "150px",
     },
    
     {
       name: "Stock",
       selector: (row) => row.Stock,
       sortable: true,
+    },
+    {
+      name: "Created at",
+      selector: (row) => row.created_at,
+      sortable: true,
+      width: "250px",
+    },
+    {
+      name: "Updated at",
+      selector: (row) => row.updated_at,
+      sortable: true,
+      width: "250px",
     },
     {
       name: "Edit",
@@ -118,39 +130,54 @@ const ProdTable = () => {
     },
   ];
 
-  const CustomHeader = ({ column }) => (
+   const CustomHeader = ({ column }) => (
     <div title={column.name} style={{ whiteSpace: "normal" }}>
       {column.name}
     </div>
   );
-  
+
   const modifiedColumns = columns.map((col) => ({
     ...col,
     header: <CustomHeader column={col} />,
   }));
 
+  const filteredUsers = users.filter(user =>
+    user.product_id.toString().includes(searchText) ||
+    user.product_name.toLowerCase().includes(searchText.toLowerCase()) ||
+    user.Description.toLowerCase().includes(searchText.toLowerCase())
+  );
+
+
+  
   return (
     <div className="order">
-    <DataTable
-      className="dataTable"
-      columns={modifiedColumns}
-      data={users}
-      fixedHeader
-      fixedHeaderScrollHeight="450px"
-      striped
-      pagination
-      highlightOnHover
-      paginationPerPage={10}
-      paginationRowsPerPageOptions={[10, 20, 30]}
-      paginationComponentOptions={{
-        rowsPerPageText: "Rows per page:",
-        rangeSeparatorText: "of",
-        noRowsPerPage: false,
-        selectAllRowsItem: false,
-      }}
-      subHeader
-      subHeaderComponent={
-        <div style={{ display: "flex", alignItems: "center" }}>
+      <input
+        type="text"
+        placeholder="Search "
+        value={searchText}
+        onChange={(e) => setSearchText(e.target.value)}
+        className="p-2 rounded border border-gray-300 focus:outline-none focus:border-blue-500"
+      />
+      <DataTable
+        className="dataTable"
+        columns={modifiedColumns}
+        data={filteredUsers}
+        fixedHeader
+        fixedHeaderScrollHeight="450px"
+        striped
+        pagination
+        highlightOnHover
+        paginationPerPage={10}
+        paginationRowsPerPageOptions={[10, 20, 30]}
+        paginationComponentOptions={{
+          rowsPerPageText: "Rows per page:",
+          rangeSeparatorText: "of",
+          noRowsPerPage: false,
+          selectAllRowsItem: false,
+        }}
+        subHeader
+        subHeaderComponent={
+          <div style={{ display: "flex", alignItems: "center" }}>
             <button
               className="bg-blue-500 text-white px-4 py-2 rounded"
               onClick={handleExportClick}
@@ -158,7 +185,7 @@ const ProdTable = () => {
               Export
             </button>
             <ExportTable
-              data={users}
+              data={filteredUsers}
               isOpen={exportModalIsOpen}
               onRequestClose={() => setExportModalIsOpen(false)}
             />

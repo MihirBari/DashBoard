@@ -10,7 +10,7 @@ import { toast } from 'react-toastify';
 const Users = () => {
     const [users, setUsers] = useState([]);
     const [exportModalIsOpen, setExportModalIsOpen] = useState(false);
-  
+    const [searchText, setSearchText] = useState('');
 
     useEffect(() => {
       const fetchOrders = async () => {
@@ -66,6 +66,7 @@ const Users = () => {
             name: 'Date',
             selector: (row) => row.debitor_Date,
             sortable: true,
+            width: "250px",
         },
         {
             name: 'Amount',
@@ -81,11 +82,25 @@ const Users = () => {
             name: 'Total Product',
             selector: (row) => row.total_product,
             sortable: true,
+            width: "140px",
         },
         {
             name: 'Other Cost',
             selector: (row) => row.other_cost,
             sortable: true,
+            width: "140px",
+        },
+        {
+          name: "Created at",
+          selector: (row) => row.created_at,
+          sortable: true,
+          width: "250px",
+        },
+        {
+          name: "Updated at",
+          selector: (row) => row.updated_at,
+          sortable: true,
+          width: "250px",
         },
         {
             name: 'Edit',
@@ -103,18 +118,41 @@ const Users = () => {
         },
     ];
 
+    const CustomHeader = ({ column }) => (
+      <div title={column.name} style={{ whiteSpace: "normal" }}>
+        {column.name}
+      </div>
+    );
+  
+    const modifiedColumns = columns.map((col) => ({
+      ...col,
+      header: <CustomHeader column={col} />,
+    }));
+
+    const filteredUsers = users.filter(user =>
+      user.debitor_name.toString().includes(searchText) 
+    );
+  
+
     return (
-        <div className="order">
+      <div className="order">
+        <input
+          type="text"
+          placeholder="Search "
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)}
+          className="p-2 rounded border border-gray-300 focus:outline-none focus:border-blue-500"
+        />
         <DataTable
           className="dataTable"
-          columns={columns}
-          data={users}
+          columns={modifiedColumns}
+          data={filteredUsers}
           fixedHeader
           fixedHeaderScrollHeight="450px"
           striped
           pagination
           highlightOnHover
-          paginationPerPage={10} // Adjust the number of rows per page
+          paginationPerPage={10}
           paginationRowsPerPageOptions={[10, 20, 30]}
           paginationComponentOptions={{
             rowsPerPageText: "Rows per page:",
@@ -127,14 +165,12 @@ const Users = () => {
             <div style={{ display: "flex", alignItems: "center" }}>
               <button
                 className="bg-blue-500 text-white px-4 py-2 rounded"
-                style={{margin:"20px"}}
                 onClick={handleExportClick}
               >
                 Export
               </button>
-  
               <ExportTable
-                data={users}
+                data={filteredUsers}
                 isOpen={exportModalIsOpen}
                 onRequestClose={() => setExportModalIsOpen(false)}
               />

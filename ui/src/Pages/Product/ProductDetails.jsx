@@ -43,8 +43,8 @@ const ProductDetails = ({ product }) => {
 
   return (
     <div className="flex flex-col justify-center items-center mt-8">
-      <div className="max-w-md w-full bg-white p-6 rounded-lg shadow-md">
-        <img src={imageSrc} alt="" />
+      <div className="max-w-md w-full bg-white p-4 rounded-lg shadow-md">
+        <img style={{ width: '150px', height: '150px', margin: '10px' }} src={imageSrc} alt="" />
         <h2 className="text-xl font-semibold mb-2">Name : {product_name}</h2>
         <p className="text-gray-600 mb-2">Description : {Description}</p>
         <p className="text-gray-800 font-semibold mb-2">product Price : ₹ {product_price}</p>

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import API_BASE_URL from "../../config";
 import axios from "axios";
@@ -7,50 +7,53 @@ import axios from "axios";
 const EditOrder = () => {
   const initialInputs = {
     creditor_name: "",
-    product_id: "",
     amount_sold: "",
-    s: 0,
-    m: 0,
-    l: 0,
-    xl: 0,
-    xxl: 0,
-    xxxl: 0,
-    xxxxl: 0,
-    xxxxxl: 0,
-    xxxxxxl: 0,
-    amount_condition: "",
+    size: "",
+    amount_condition: "yes",
     returned: "No",
   };
+
+  const { product_id } = useParams();  
 
   const [inputs, setInputs] = useState(initialInputs);
   const [err, setError] = useState(null);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setInputs((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
-  };
 
+    setInputs((prev) => {
+      if (name === "Size") {
+        return {
+          ...prev,
+          size: value,
+        };
+      } else if (name === "sizeValue") {
+        return {
+          ...prev,
+          sizeValue: value,
+        };
+      } else {
+        return {
+          ...prev,
+          [name]: type === "checkbox" ? checked : value,
+        };
+      }
+    });
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(
-        `${API_BASE_URL}/api/updateOrder/:order_id`,
-        inputs
-      );
+      await axios.put(`${API_BASE_URL}/api/order/updateOrder/${product_id}`, inputs);
       console.log(inputs);
       setInputs(initialInputs);
-      toast.success("Order created successfully");
+      toast.success("Order updated successfully");
       window.location.reload();
     } catch (err) {
       console.error(err);
       setError(err.response);
-      toast.error("Failed to create order");
+      toast.error("Failed to update order");
     }
   };
-
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
@@ -76,24 +79,6 @@ const EditOrder = () => {
                     required
                     onChange={handleChange}
                     placeholder="Enter Customer Name"
-                    className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                  />
-                </div>
-              </div>
-              <div>
-                <label
-                  htmlFor="product_id"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Product ID
-                </label>
-                <div className="mt-1">
-                  <input
-                    type="text"
-                    name="product_id"
-                    required
-                    onChange={handleChange}
-                    placeholder="Product ID"
                     className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                   />
                 </div>
@@ -160,18 +145,17 @@ const EditOrder = () => {
                   </select>
                 </div>
               </div>
-
+  
               <div>
                 <label
-                  htmlFor="amount_condition"
+                  htmlFor="Size"
                   className="block text-sm font-medium text-gray-700"
                 >
                   Sizes
                 </label>
                 <div className="mt-1 relative flex items-center">
-                  {/* Dropdown box for sizes */}
                   <select
-                    name="amount_condition"
+                    name="Size"
                     required
                     onChange={handleChange}
                     className="ml-2 appearance-none block w-1/2 px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
@@ -183,14 +167,12 @@ const EditOrder = () => {
                     <option value="m">M</option>
                     <option value="l">L</option>
                     <option value="xl">XL</option>
-                    <option value="xxl">XXL</option>
-                    <option value="xxxl">XXXL</option>
-                    <option value="xxxxl">XXXXL</option>
-                    <option value="xxxxxl">XXXXXL</option>
-                    <option value="xxxxxxl">XXXXXXL</option>
+                    <option value="xxl">2XL</option>
+                    <option value="xxxl">3XL</option>
+                    <option value="xxxxl">4XL</option>
+                    <option value="xxxxxl">5XL</option>
+                    <option value="xxxxxxl">6XL</option>
                   </select>
-
-                  {/* New input box for size value */}
                   <input
                     type="text"
                     name="sizeValue"
@@ -200,6 +182,7 @@ const EditOrder = () => {
                   />
                 </div>
               </div>
+  
             </div>
             <div className="flex justify-between items-center mt-4">
               <button
@@ -219,6 +202,7 @@ const EditOrder = () => {
       </div>
     </div>
   );
+  
 };
 
 export default EditOrder;

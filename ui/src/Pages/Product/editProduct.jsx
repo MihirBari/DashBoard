@@ -32,13 +32,7 @@ export const EditProduct = () => {
         if (product_id) {
           const response = await axios.get(`${API_BASE_URL}/api/prod/Product/${product_id}`);
           const productData = response.data;
-  
-          console.log('Fetched product data:', productData);
-  
-          // Check the structure of the response data
-          console.log('Response data structure:', Object.keys(productData));
-  
-          // Set the initial state dynamically from the backend response
+
           setProduct({
             product_name: productData.product_name || "",
             Description: productData.Description || "",
@@ -52,9 +46,8 @@ export const EditProduct = () => {
             xxxxxl: productData.xxxxxl || 0,
             xxxxxxl: productData.xxxxxxl || 0,
             product_price: productData.product_price || "",
-            Cost_price:productData.Cost_price || "",
+            Cost_price: productData.Cost_price || "",
             product_type: productData.product_type || "",
-          
           });
         } else {
           console.error('Product ID is undefined');
@@ -63,43 +56,25 @@ export const EditProduct = () => {
         console.error('Error fetching product:', error);
       }
     };
-  
+
     fetchProduct();
   }, [product_id]);
 
   const handleSave = async (editedProduct) => {
     try {
-      // Convert product_price and Cost_price to numbers
-      
-  
-      // Ensure product_id is included in the request
-      editedProduct.product_id = product_id;
-  
-      // Filter out properties with values equal to null or 0
-      const filteredProduct = Object.entries(editedProduct).reduce(
-        (acc, [key, value]) => {
-          if (value !== null && value !== 0 && value !== '' & value !== undefined  ) {
-            acc[key] = value;
-          }
-          return acc;
-        },
-        {}
-      );
-  
       const response = await axios.put(
-        `${API_BASE_URL}/api/prod/updateProduct/${editedProduct.product_id}`,
-        { data: [filteredProduct] }
+        `${API_BASE_URL}/api/prod/updateProduct/${product_id}`,
+        editedProduct
       );
-  
+
       console.log('Response from backend:', response.data);
-      setProduct(filteredProduct);
       toast.success('Edited completely');
-      console.log('Updated product:', filteredProduct);
-      window.location.reload();
+      console.log('Updated product:', editedProduct);
     } catch (error) {
       console.error('Error updating product:', error);
     }
   };
+
   console.log('Rendered with product:', product);
 
   return (

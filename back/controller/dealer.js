@@ -2,7 +2,7 @@ const { pool } = require("../database");
 
 const showDealer = (req,res) => {
 
-    const dealer = `SELECT id,debitor_name, debitor_Date, 	debitor_Amount, debitor_paid_by, total_product, other_cost FROM debitors`;
+    const dealer = `SELECT id,debitor_name, debitor_Date, 	debitor_Amount, debitor_paid_by, total_product, other_cost,created_at,updated_at FROM debitors`;
 
     pool.query(dealer, (error, results) => {
       if (error) {

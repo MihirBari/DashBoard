@@ -4,9 +4,11 @@ import Maiin from './maiin';  // Assuming that 'maiin' is a component and not a 
 
 const Dashboard = () => {
   return (
-    <div style={{ display: 'flex' }}>
+    <div className="flex">
       <SideNavBar />
-      <Maiin />
+      <div className="flex-1  p-6">
+        <Maiin />
+      </div>
     </div>
   );
 }

@@ -4,10 +4,12 @@ import Maiin from './maiin';  // Assuming that 'maiin' is a component and not a 
 
 const Seller = () => {
   return (
-    <div style={{ display: 'flex' }}>
-      <SideNavBar />
+    <div className="flex h-screen overflow-hidden">
+    <SideNavBar />
+    <div className="flex-1 overflow-x-hidden overflow-y-auto">
       <Maiin />
     </div>
+  </div>
   );
 }
 

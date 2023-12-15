@@ -3,13 +3,15 @@ import React, { useEffect, useState } from 'react';
 import "./orders.css"
 import DataTable from 'react-data-table-component';
 import API_BASE_URL from "../../config";
-import { MdEdit  } from "react-icons/md";
+import { MdDelete, MdEdit  } from "react-icons/md";
 import ExportTable from '../ExportTable';
 import {  useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 const TableOrder = () => {
   const [users, setUsers] = useState([]);
   const [exportModalIsOpen, setExportModalIsOpen] = useState(false);
+  const [searchText, setSearchText] = useState('');
   const navigate = useNavigate();
 
   
@@ -36,20 +38,20 @@ const TableOrder = () => {
       navigate(`edit/${product_id}`);
   };
 
-    // const handleDeleteClick = (product_id) => {
-    //   const idToDelete = product_id; 
-    //   console.log('Deleting order with ID:', idToDelete);
+    const handleDeleteClick = (product_id) => {
+      const idToDelete = product_id; 
+      console.log('Deleting order with ID:', idToDelete);
     
-    //   axios.delete(`${API_BASE_URL}/api/order/delete`, { data: { productId: idToDelete } })
-    //     .then(response => {
-    //       console.log('Delete successful:', response.data);
-    //       window.location.reload();
-    //       toast.success("Deleted Successfully");
-    //     })
-    //     .catch(error => {
-    //       console.error('Error deleting:', error);
-    //     });
-    // };;
+      axios.delete(`${API_BASE_URL}/api/order/delete`, { data: { productId: idToDelete } })
+        .then(response => {
+          console.log('Delete successful:', response.data);
+          window.location.reload();
+          toast.success("Deleted Successfully");
+        })
+        .catch(error => {
+          console.error('Error deleting:', error);
+        });
+    };;
 
 
     const handleExportClick = () => {
@@ -78,11 +80,13 @@ const TableOrder = () => {
             name: 'Product Name',
             selector: (row) => row.product_name,
             sortable: true,
+            width: '150px',
         },
         {
             name: 'Amount Sold(₹)',
             selector: (row) => row.amount_sold,
             sortable: true,
+            width: '150px',
         },
         {
             name: 'TotaL Items',
@@ -92,10 +96,8 @@ const TableOrder = () => {
         {
           name: 'Size',
           selector: (row) => {
-            // Assuming that the size properties are named 's', 'm', 'l', etc.
             const sizeValues = ['s', 'm', 'l', 'xl', 'xxl', 'xxxl', 'xxxxl', 'xxxxxl', 'xxxxxxl'];
             
-            // Filter out null or undefined values and return only the column names
             const sizes = sizeValues
               .filter(size => row[size] !== null && row[size] !== undefined)
               .join(', ');
@@ -108,6 +110,7 @@ const TableOrder = () => {
             name: 'Amount Condition',
             selector: (row) => row.amount_condition, 
             sortable: true,
+            width: '150px',
         },
         {
             name: 'Returned',
@@ -141,18 +144,42 @@ const TableOrder = () => {
         // },
     ];
 
+    const CustomHeader = ({ column }) => (
+      <div title={column.name} style={{ whiteSpace: "normal" }}>
+        {column.name}
+      </div>
+    );
+  
+    const modifiedColumns = columns.map((col) => ({
+      ...col,
+      header: <CustomHeader column={col} />,
+    }));
+
+    const filteredUsers = users.filter(user =>
+      user.product_id.toString().includes(searchText) ||
+      user.creditor_name.toLowerCase().includes(searchText.toLowerCase()) 
+    );
+  
+
     return (
-        <div className="order">
+      <div className="order">
+        <input
+          type="text"
+          placeholder="Search "
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)}
+          className="p-2 rounded border border-gray-300 focus:outline-none focus:border-blue-500"
+        />
         <DataTable
           className="dataTable"
-          columns={columns}
-          data={users}
+          columns={modifiedColumns}
+          data={filteredUsers}
           fixedHeader
           fixedHeaderScrollHeight="450px"
           striped
           pagination
           highlightOnHover
-          paginationPerPage={10} // Adjust the number of rows per page
+          paginationPerPage={10}
           paginationRowsPerPageOptions={[10, 20, 30]}
           paginationComponentOptions={{
             rowsPerPageText: "Rows per page:",
@@ -169,9 +196,8 @@ const TableOrder = () => {
               >
                 Export
               </button>
-  
               <ExportTable
-                data={users}
+                data={filteredUsers}
                 isOpen={exportModalIsOpen}
                 onRequestClose={() => setExportModalIsOpen(false)}
               />

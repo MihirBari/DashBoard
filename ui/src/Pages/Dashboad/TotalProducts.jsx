@@ -19,7 +19,7 @@ const TotalProducts = () => {
   }, []);
 
   return (
-    <div className="flex items-center justify-center h-screen">
+    <div >
       <div className="bg-gray-200 p-4 rounded-md shadow-md">
         <h2 className="text-xl font-bold mb-4">Total Products</h2>
         <div className="mb-2">

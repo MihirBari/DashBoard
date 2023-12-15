@@ -1,137 +1,220 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 
 const EditableProductDetails = ({ product, onSave }) => {
-  const [editedProduct, setEditedProduct] = useState({ ...product });
+  const [editedProduct, setEditedProduct] = useState(product);
 
+  useEffect(() => {
+    setEditedProduct(product);
+  }, [product]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setEditedProduct((prevProduct) => ({
-      ...prevProduct,
-      [name]: value,
-    }));
+  const handleInputChange = (e) => {
+    const value =
+      e.target.type === "number" ? Number(e.target.value) : e.target.value;
+
+    setEditedProduct({ ...editedProduct, [e.target.name]: value });
   };
 
-  const handleSizeChange = (label, newQuantity) => {
-    setEditedProduct((prevProduct) => ({
-      ...prevProduct,
-      [label.toLowerCase()]: newQuantity,
-    }));
+  const handleSaveClick = () => {
+    // Convert relevant fields to numbers
+    const formattedData = {
+      data: [
+        {
+          ...editedProduct,
+          s: Number(editedProduct.s),
+          m: Number(editedProduct.m),
+          l: Number(editedProduct.l),
+          xl: Number(editedProduct.xl),
+          xxl: Number(editedProduct.xxl),
+          xxxl: Number(editedProduct.xxxl),
+          xxxxl: Number(editedProduct.xxxxl),
+          xxxxxl: Number(editedProduct.xxxxxl),
+          xxxxxxl: Number(editedProduct.xxxxxxl),
+          Cost_price: Number(editedProduct.Cost_price),
+          product_price: Number(editedProduct.product_price),
+        },
+      ],
+    };
+
+    onSave(formattedData);
   };
-
-  const handleSave = () => {
-    onSave(editedProduct);
-  };
-
-  const {
-    product_name,
-    Description,
-    s,
-    m,
-    l,
-    xl,
-    xxl,
-    xxxl,
-    xxxxl,
-    xxxxxl,
-    xxxxxxl,
-    product_price,
-    Cost_price,
-    product_type,
-
-  } = editedProduct;
-
-  const sizes = [
-    { label: 'S', quantity: s },
-    { label: 'M', quantity: m },
-    { label: 'L', quantity: l },
-    { label: 'XL', quantity: xl },
-    { label: 'XXL', quantity: xxl },
-    { label: 'XXXL', quantity: xxxl },
-    { label: 'XXXXL', quantity: xxxxl },
-    { label: 'XXXXXL', quantity: xxxxxl },
-    { label: 'XXXXXXL', quantity: xxxxxxl },
-  ];
 
   return (
-    <div className="flex justify-center items-center mt-8 ">
-  <div className="max-w-md w-full bg-white p-6 rounded-lg shadow-md">
-   
-
-    <label htmlFor="product_name" className="text-gray-600 block mt-4">Product Name:</label>
-    <input
-      type="text"
-      name="product_name"
-      value={product_name}
-      onChange={handleChange}
-      className="text-xl font-semibold mb-2 border border-gray-300 rounded-md px-2 py-1"
-    />
-
-    <label htmlFor="Description" className="text-gray-600 block mt-4">Description:</label>
-    <textarea
-      name="Description"
-      value={Description}
-      onChange={handleChange}
-      className="text-gray-600 mb-2 border border-gray-300 rounded-md px-2 py-1"
-    ></textarea>
-
-    <label htmlFor="product_price" className="text-gray-600 block mt-4">Product Price:</label>
-    <input
-      type="text"
-      name="product_price"
-      value={product_price}
-      onChange={handleChange}
-      className="text-gray-800 font-semibold mb-2 border border-gray-300 rounded-md px-2 py-1"
-    />
-
-<label htmlFor="Cost_price" className="text-gray-600 block mt-4">Cost Price:</label>
-    <input
-      type="text"
-      name="Cost_price"
-      value={Cost_price}
-      onChange={handleChange}
-      className="text-gray-800 font-semibold mb-2 border border-gray-300 rounded-md px-2 py-1"
-    />
-
-    <label htmlFor="product_type" className="text-gray-600 block mt-4">Product Type:</label>
-    <input
-      type="text"
-      name="product_type"
-      value={product_type}
-      onChange={handleChange}
-      className="text-gray-600 mb-2 border border-gray-300 rounded-md px-2 py-1"
-    />
-
-        <div className="flex items-center flex-wrap space-x-2 mt-4 ">
-          <p className="text-gray-600 mr-2">Sizes:</p>
-          {sizes.map((size) => (
-            <div key={size.label} className="flex items-center space-x-1 mb-2">
-              <span className="border border-gray-300 px-2 py-1 rounded-md text-gray-600">
-                {size.label}
-              </span>
+    <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+      <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+        <form className="space-y-6">
+          <div className="grid grid-cols-2 gap-4">
+  
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Product Name:</label>
               <input
-                type="number"
-                value={size.quantity}
-                onChange={(e) => handleSizeChange(size.label, e.target.value)}
-                className="border border-gray-300 px-2 py-1 rounded-md"
+                type="text"
+                name="product_name"
+                value={editedProduct.product_name}
+                onChange={handleInputChange}
+                className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               />
             </div>
-          ))}
-        </div>
-           
-       <div  className="flex justify-between items-center mt-4" >
-        <button onClick={handleSave} className="bg-blue-500 text-white mt-4 p-2 rounded-md">
-          Save
-        </button>
-
-        <Link  to="/product">
-        <button   className="bg-blue-500 text-white mt-4 p-2 rounded-md">
-          Back
-        </button>
-        </Link> 
-       </div>
-       
+  
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Description:</label>
+              <input
+                type="text"
+                name="Description"
+                value={editedProduct.Description}
+                onChange={handleInputChange}
+                className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              />
+            </div>
+  
+            <div>
+              <label className="block text-sm font-medium text-gray-700">S:</label>
+              <input
+                type="number"
+                name="s"
+                value={editedProduct.s}
+                onChange={handleInputChange}
+                className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              />
+            </div>
+  
+            <div>
+              <label className="block text-sm font-medium text-gray-700">M:</label>
+              <input
+                type="number"
+                name="m"
+                value={editedProduct.m}
+                onChange={handleInputChange}
+                className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              />
+            </div>
+  
+            <div>
+              <label className="block text-sm font-medium text-gray-700">L:</label>
+              <input
+                type="number"
+                name="l"
+                value={editedProduct.l}
+                onChange={handleInputChange}
+                className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              />
+            </div>
+  
+            <div>
+              <label className="block text-sm font-medium text-gray-700">XL:</label>
+              <input
+                type="number"
+                name="xl"
+                value={editedProduct.xl}
+                onChange={handleInputChange}
+                className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              />
+            </div>
+  
+            <div>
+              <label className="block text-sm font-medium text-gray-700">2XL:</label>
+              <input
+                type="number"
+                name="xxl"
+                value={editedProduct.xxl}
+                onChange={handleInputChange}
+                className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              />
+            </div>
+  
+            <div>
+              <label className="block text-sm font-medium text-gray-700">3XL:</label>
+              <input
+                type="number"
+                name="xxxl"
+                value={editedProduct.xxxl}
+                onChange={handleInputChange}
+                className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              />
+            </div>
+  
+            <div>
+              <label className="block text-sm font-medium text-gray-700">4XL:</label>
+              <input
+                type="number"
+                name="xxxxl"
+                value={editedProduct.xxxxl}
+                onChange={handleInputChange}
+                className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              />
+            </div>
+  
+            <div>
+              <label className="block text-sm font-medium text-gray-700">5XL:</label>
+              <input
+                type="number"
+                name="xxxxxl"
+                value={editedProduct.xxxxxl}
+                onChange={handleInputChange}
+                className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              />
+            </div>
+  
+            <div>
+              <label className="block text-sm font-medium text-gray-700">6XL:</label>
+              <input
+                type="number"
+                name="xxxxxxl"
+                value={editedProduct.xxxxxxl}
+                onChange={handleInputChange}
+                className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              />
+            </div>
+  
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Product Price:</label>
+              <input
+                type="text"
+                name="product_price"
+                value={editedProduct.product_price}
+                onChange={handleInputChange}
+                className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              />
+            </div>
+  
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Cost Price:</label>
+              <input
+                type="text"
+                name="Cost_price"
+                value={editedProduct.Cost_price}
+                onChange={handleInputChange}
+                className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              />
+            </div>
+  
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Product Type:</label>
+              <input
+                type="text"
+                name="product_type"
+                value={editedProduct.product_type}
+                onChange={handleInputChange}
+                className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              />
+            </div>
+  
+          </div>
+  
+          <div className="flex justify-between items-center mt-4">
+            <button
+              onClick={handleSaveClick}
+              className="group relative w-[100px] h-[40px] flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+            >
+              Save
+            </button>
+            <Link to="/product">
+              <button className="group relative w-[100px] h-[40px] flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                Back
+              </button>
+            </Link>
+          </div>
+        </form>
       </div>
     </div>
   );

@@ -26,7 +26,6 @@ const AddProd = () => {
   const [inputs, setInputs] = useState(initialInputs);
   const [err, setError] = useState(null);
 
-
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setInputs((prev) => ({
@@ -34,12 +33,12 @@ const AddProd = () => {
       [name]: type === "checkbox" ? checked : value,
     }));
   };
-  
+
   const handleImageChange = async (e) => {
     const file = e.target.files[0];
     const formData = new FormData();
     formData.append("image", file);
-  
+
     try {
       const response = await axios.post(
         `${API_BASE_URL}/api/prod/upload`,
@@ -50,9 +49,8 @@ const AddProd = () => {
           },
         }
       );
-  
+
       if (response.status === 200) {
-       
         setInputs((prev) => ({
           ...prev,
           product_image: response.data.imagePath,
@@ -89,14 +87,14 @@ const AddProd = () => {
         xxxxxl: inputs.xxxxxl,
         xxxxxxl: inputs.xxxxxxl,
         product_price: inputs.product_price,
-        Cost_price:inputs.Cost_price,
+        Cost_price: inputs.Cost_price,
         product_type: inputs.product_type,
         product_image: inputs.product_image,
       };
- 
-      console.log(product)
-       
-       await axios.post(
+
+      console.log(product);
+
+      await axios.post(
         `${API_BASE_URL}/api/prod/addProduct`,
         { data: [product] },
         {
@@ -107,7 +105,7 @@ const AddProd = () => {
       );
 
       setInputs(initialInputs);
-       window.location.reload()
+      window.location.reload();
       toast.success("Product added successfully");
     } catch (err) {
       console.error(err);
@@ -115,7 +113,6 @@ const AddProd = () => {
       toast.error("Failed to add Product");
     }
   };
-
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">

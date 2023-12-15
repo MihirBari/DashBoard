@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import API_BASE_URL from '../config';
+import API_BASE_URL from '../../config';
 
 const ImageGallery = () => {
   const [images, setImages] = useState([]);
 
   useEffect(() => {
-    // Fetch images from the server
     axios.get(`${API_BASE_URL}/api/prod/sendImage`)
       .then((response) => {
         setImages(response.data);
@@ -18,9 +17,12 @@ const ImageGallery = () => {
   }, []);
 
   return (
-    <div>
-      <h1 style={{ textAlign: 'center' }}>Product Gallery</h1>
-      <div className="image-container">
+    <>
+
+    <div >
+      <h1 style={{ textAlign: 'center', fontWeight:'500' }}>Product Images</h1>
+
+      <div className="flex flex-row flex-wrap justify-start">
         {images.map((image) => (
           <Link to={`/product/${image.product_id}`} key={image.product_id}>
             <ProductImage product_image={image.image} product_id={image.product_id} />
@@ -28,6 +30,8 @@ const ImageGallery = () => {
         ))}
       </div>
     </div>
+
+    </>
   );
 };
 
@@ -36,9 +40,8 @@ const ProductImage = ({ product_image, product_id }) => {
 
   useEffect(() => {
     try {
-      // Convert ArrayBuffer to base64
-      const base64Image = arrayBufferToBase64(product_image);
-      setImageSrc(`data:image/jpeg;base64,${base64Image}`);
+      // Convert base64 string to data URL
+      setImageSrc(`data:image/jpeg;base64,${product_image}`);
     } catch (error) {
       console.error('Error processing image:', error);
     }
@@ -51,16 +54,6 @@ const ProductImage = ({ product_image, product_id }) => {
       style={{ width: '150px', height: '150px', margin: '10px' }}
     />
   );
-};
-
-// Function to convert ArrayBuffer to base64
-const arrayBufferToBase64 = (buffer) => {
-  let binary = '';
-  const bytes = new Uint8Array(buffer);
-  for (let i = 0; i < bytes.byteLength; i++) {
-    binary += String.fromCharCode(bytes[i]);
-  }
-  return btoa(binary);
 };
 
 export default ImageGallery;

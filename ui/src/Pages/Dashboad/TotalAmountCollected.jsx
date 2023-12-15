@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import API_BASE_URL from '../../config.js';
 import DateFilter from './DateFilter.jsx'; // Update the path accordingly
+import { Link } from 'react-router-dom';
 
 const TotalAmountCollected = () => {
   const [totalSales, setTotalSales] = useState(0);
@@ -31,13 +32,15 @@ const TotalAmountCollected = () => {
   };
 
   return (
-    <div className="flex items-center justify-center h-screen">
+    <div >
       <div className="bg-gray-200 p-4 rounded-md shadow-md">
         <h2 className="text-xl font-bold mb-4">Total Amount Collected</h2>
         <DateFilter onFilterChange={handleFilterChange} />
+        <Link to ='/Customer'>
         <div className="mb-2">
         ₹ {totalSales}
         </div>
+        </Link>
       </div>
     </div>
   );

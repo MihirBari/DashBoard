@@ -2,16 +2,6 @@ const { pool } = require("../database");
 const multer = require("multer");
 const path = require("path");
 const sharp = require("sharp");
-const util = require("util");
-
-pool.getConnection((err, connection) => {
-  if (err) {
-    console.error("Error connecting to the database:", err.message);
-  } else {
-    console.log("Connected to the database!");
-    connection.release();
-  }
-});
 
 const poolQuery = (query, values) => {
   return new Promise((resolve, reject) => {
@@ -52,7 +42,7 @@ const uploadAsync = async (req, res) => {
 };
 
 const inventory = (req, res) => {
-  const inventory = `SELECT product_id, product_name, Description, Stock, s, m, l, xl, xxl, xxxl, xxxxl, xxxxxl, xxxxxxl,Stock, product_price,Cost_price, product_type
+  const inventory = `SELECT product_id, product_name, Description, Stock, s, m, l, xl, xxl, xxxl, xxxxl, xxxxxl, xxxxxxl,Stock, product_price,Cost_price, product_type, created_at, updated_at
                     FROM products`;
 
   pool.query(inventory, (error, results) => {
@@ -197,79 +187,78 @@ const addProduct = async (req, res) => {
   }
 };
 
+// backend
 const updateProduct = async (req, res) => {
-  const productId = req.params.product_id;
-  console.log(productId);
-
-  if (!req.body.data || !Array.isArray(req.body.data) || req.body.data.length === 0) {
-    return res.status(400).json({ error: 'Invalid data format' });
+  if (!req.body.data || !Array.isArray(req.body.data)) {
+    return res.status(400).json({ error: "Invalid data format" });
   }
 
+  
   try {
-    const getCurrentValuesQuery = `
-      SELECT s, m, l, xl, xxl, xxxl, xxxxl, xxxxxl, xxxxxxl
-      FROM products
-      WHERE product_id = ?;
-    `;
-
-    const currentValuesResult = await pool.query(getCurrentValuesQuery, [productId]);
-
-    if (!currentValuesResult || currentValuesResult.length === 0 || !currentValuesResult[0]) {
-      return res.status(404).json({ error: 'Product not found' });
-    }
-
-    const currentValues = currentValuesResult[0][0];
-
-    if (!currentValues) {
-      return res.status(404).json({ error: 'Product not found' });
-    }
-
-    const updateProdBase = `
+    const updateQuery = `
       UPDATE products
-      SET
+      SET 
+        product_name = ?,
+        Description = ?,
+        s = ?,
+        m = ?,
+        l = ?,
+        xl = ?,
+        xxl = ?,
+        xxxl = ?,
+        xxxxl = ?,
+        xxxxxl = ?,
+        xxxxxxl = ?,
+        stock = ?,
+        product_price = ?,
+        Cost_price = ?,
+        product_type = ?,
+        ${req.body.data.product_image ? 'product_image = ?,' : ''}
+        updated_at = NOW()
+      WHERE product_id = ?
     `;
 
     for (const product of req.body.data) {
-      const updateColumns = [];
-      const updateValues = [];
-      let totalStock = 0;
+      const totalStock =
+        (isNaN(+product.s) ? 0 : +product.s) +
+        (isNaN(+product.m) ? 0 : +product.m) +
+        (isNaN(+product.l) ? 0 : +product.l) +
+        (isNaN(+product.xl) ? 0 : +product.xl) +
+        (isNaN(+product.xxl) ? 0 : +product.xxl) +
+        (isNaN(+product.xxxl) ? 0 : +product.xxxl) +
+        (isNaN(+product.xxxxl) ? 0 : +product.xxxxl) +
+        (isNaN(+product.xxxxxl) ? 0 : +product.xxxxxl) +
+        (isNaN(+product.xxxxxxl) ? 0 : +product.xxxxxxl);
 
-      // Specify the columns you want to update and their corresponding values
-      for (const key in product) {
-        if (key !== 'product_id') {
-          updateColumns.push(`${key} = ?`);
-          updateValues.push(product[key]);
-        }
-
-        // Calculate total stock
-        if (['s', 'm', 'l', 'xl', 'xxl', 'xxxl', 'xxxxl', 'xxxxxl', 'xxxxxxl'].includes(key)) {
-          totalStock += (isNaN(+product[key]) ? 0 : +product[key]) + (isNaN(+currentValues[key]) ? 0 : +currentValues[key]);
-        }
-      }
-
-      // Update the stock column
-      updateColumns.push('stock = ?');
-      updateValues.push(totalStock);
-
-      // Add the common columns
-      updateColumns.push('updated_at = NOW()');
-      updateValues.push(productId);
-
-      const updateProd = updateProdBase + updateColumns.join(',\n') + '\nWHERE product_id = ?';
-
-      const values = [...updateValues, productId];
-
-      console.log('Updating product with values:', values);
-      await pool.query(updateProd, values);
+      const values = [
+        product.product_name,
+        product.Description,
+        +product.s,
+        +product.m,
+        +product.l,
+        +product.xl,
+        +product.xxl,
+        +product.xxxl,
+        +product.xxxxl,
+        +product.xxxxxl,
+        +product.xxxxxxl,
+        totalStock,
+        product.product_price,
+        product.Cost_price,
+        product.product_type,
+        ...(req.body.data.product_image ? [product.product_image] : []),
+        req.params.product_id,
+      ];
+     console.log(values)
+      await pool.query(updateQuery, values);
     }
 
-    res.json({ message: 'Products updated successfully' });
+    res.json({ message: "Products updated successfully" });
   } catch (error) {
-    console.error('Error updating products:', error.message);
-    res.status(500).json({ error: 'Internal Server Error' });
+    console.error("Error updating products:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
-
 
 const productId = async (req, res) => {
   try {
@@ -335,14 +324,14 @@ const sendImage = async (req, res) => {
           image: base64Image,
         };
       } catch (sharpError) {
-      
+        console.error('Error processing image with sharp:', sharpError);
         return null;
       }
     }));
 
     res.json(images.filter(Boolean));
   });
-};
+}
 
 
 module.exports = {
