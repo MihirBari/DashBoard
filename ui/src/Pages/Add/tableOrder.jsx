@@ -51,7 +51,7 @@ const TableOrder = () => {
         .catch(error => {
           console.error('Error deleting:', error);
         });
-    };;
+    };
 
 
     const handleExportClick = () => {

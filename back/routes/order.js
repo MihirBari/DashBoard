@@ -4,7 +4,7 @@ const { order, updateOrder,updateOrder1,viewOneOrder, viewOrder,deleteOrder } = 
 const router = express.Router();
 
 router.get(`/viewOrder`, viewOrder);
-router.get(`/viewOneOrder`, viewOneOrder);
+router.get(`/viewOneOrder/:product_id`, viewOneOrder);
 router.post("/order", order);
 router.put(`/updateOrder/:product_id`, updateOrder1);
 router.delete("/delete", deleteOrder);

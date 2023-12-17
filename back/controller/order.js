@@ -376,7 +376,7 @@ const viewOneOrder = async (req, res) => {
 };
 
 const deleteOrder = (req, res) => {
-  const productId = req.body.productId;
+  const productId = req.body.product_id;
 
   if (!productId) {
     return res

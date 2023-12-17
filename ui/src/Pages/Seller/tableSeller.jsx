@@ -6,12 +6,13 @@ import API_BASE_URL from "../../config";
 import { MdEdit, MdDelete  } from "react-icons/md";
 import ExportTable from '../ExportTable';
 import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 const Users = () => {
     const [users, setUsers] = useState([]);
     const [exportModalIsOpen, setExportModalIsOpen] = useState(false);
     const [searchText, setSearchText] = useState('');
-
+    const navigate = useNavigate();
     useEffect(() => {
       const fetchOrders = async () => {
         try {
@@ -26,9 +27,8 @@ const Users = () => {
       fetchOrders();
     }, []);
   
-    const handleEditClick = (row) => {
-      console.log("Edit clicked for:", row);
-      // Add your edit logic here
+    const handleEditClick = (userId) => {
+      navigate(`edit/${userId.id}`);
     };
   
     const handleDeleteClick = (userId) => {

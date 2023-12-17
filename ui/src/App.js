@@ -12,6 +12,7 @@ import addUser from './Pages/User/addUser.jsx';
 import Product from './Pages/Product/products.jsx';
 import AddProd from './Pages/Product/addProduct.jsx';
 import Seller from './Pages/Seller/Seller'
+import EditSeller from './Pages/Seller/editSeller.jsx'
 import addSeller from './Pages/Seller/addSeller'
 import  veiwProduct  from './Pages/Product/veiwProduct.jsx';
 import  {EditProduct}  from './Pages/Product/editProduct.jsx';
@@ -19,7 +20,6 @@ import AddOrder from './Pages/Add/addOrder.jsx';
 import Order from './Pages/Add/order.jsx';
 import EditOrder from './Pages/Add/editOrder.jsx';
 import Image from './Pages/Image/Image.jsx';
-
 
 function App() {
   return (
@@ -37,6 +37,7 @@ function App() {
         <Route path='/Customer'  Component={Order} > </Route>
         <Route path='/addCustomer'  Component={AddOrder} > </Route>
         <Route path="/Customer/edit/:product_id"  Component={EditOrder} > </Route>
+        <Route path="/Seller/edit/:id"  Component={EditSeller} > </Route>
         <Route path="/Product/:product_Id"  Component={veiwProduct} > </Route>
         <Route path="/Product/edit/:product_id"  Component={EditProduct} > </Route>
         <Route path="/Search"  Component={Image} > </Route>
